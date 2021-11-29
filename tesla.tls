@@ -1,0 +1,28 @@
+"name":"cipv-low-vis",
+"requester":"img-vid-cipv-low-vis-{{seq}}",
+"description":"Low visibility with a CIPV",
+"query":{
+    "$and":[
+      {"$eq":[
+          {"$decimate":
+              {"$conv":
+                {"$and":[
+                  {"$eq":["{{active-gear}}",4]}, //In drive
+                  {"$not":"@VisionSceneTags.main.scene_tag_array[13].activated"}, // GARAGE_DOOR_CLOSED
+                  {"$not":"@VisionSceneTags.main.scene_tag_array[15].activated"}, // INDOOR
+                  {"$gt":"@TelemetryOutput.distance_travelled_m", 1000},
+                  {"$not":"@lss_app.right_lane.lane_change"}, // No right lane change
+                  {"$not":"@lss_app.left_lane.lane_change"}, // No left lane change
+                  {"$not":"@moving_object_output[0].cution_active_in_scene"}, // No cutin
+                  {"lt":"@moving_object_output[0].max_region_tag_cutin_prob",0.1},
+                  {"lt":"@moving_object_output[2].max_region_tag_cutin_prob",0.1},
+                  {"$gt":"{{veh-speed-mps}}",2.2} //5 mph
+                ]},
+                "h":[1,1,1,1,1, 1,1,1,1,1] //10s
+              },
+              "N":50, // 1s period
+              "stateless-child":true
+          }
+      ]}
+    ]
+}
